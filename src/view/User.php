@@ -113,9 +113,9 @@ class User {
     if ($this->userWantsToLogin()) {
       setcookie($this->usernameFormCookie, $_POST["username"], 0);
     }
-    // else {
-    //   setcookie($this->usernameFormCookie, "", time() -1);
-    // }
+    else {
+      setcookie($this->usernameFormCookie, "", time() -1);
+    }
 
     $username = $this->getUsernameFormCookie();
 
