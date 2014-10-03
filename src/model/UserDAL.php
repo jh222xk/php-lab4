@@ -15,12 +15,13 @@ class UserDAL {
 
   public function __construct(\PDO $pdo) {
     $this->pdo = $pdo;
+    //$this->createTable();
   }
 
   public function createTable() {
     $sql = "CREATE TABLE `" . self::$tableName . "`
             (
-              `pk` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+              `" . self::$primaryKey . "` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
               `" . self::$username ."` VARCHAR(255),
               `" . self::$password ."` VARCHAR(255)
             )";

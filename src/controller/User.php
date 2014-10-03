@@ -42,7 +42,6 @@ class User {
    */
   public function showPage() {
     // User logged in, giv'em the logout!
-    var_dump($this->model->userIsLoggedIn($this->view->getClientIdentifier()));
     if ($this->model->userIsLoggedIn($this->view->getClientIdentifier())) {
       return $this->doLogout();
     }
