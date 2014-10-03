@@ -1,6 +1,6 @@
 # PHP-labb 4
 
-Applikationen finns som en körbar version [här](http://login-app-lnu.herokuapp.com/).
+Applikationen finns som en körbar version [här](http://jh222xk-lab4.herokuapp.com/).
 
 
 ## Databas
