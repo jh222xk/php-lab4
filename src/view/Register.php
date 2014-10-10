@@ -16,12 +16,14 @@ class Register {
 
   private $password;
 
+  private $password_confirmation;
+
   private $errors = array();
 
   private $usernameFormCookie = "User::Form::Username";
   
-  function __construct() {
-    // $this->model = $model;
+  function __construct($model) {
+    $this->model = $model;
     $this->message = new \view\CookieJar();
   }
 
@@ -32,6 +34,14 @@ class Register {
     else {
       return "";
     }
+  }
+
+  public function setInvalidCharsMessage() {
+    $this->message->save("Användarnamnet innehåller ogiltiga tecken!");
+  }
+
+  public function setUsernameTakenMessage() {
+    $this->message->save("Användarnamnet är redan upptaget!");
   }
 
   public function setRegCookie() {
@@ -93,33 +103,52 @@ class Register {
     return isset($_POST["register"]);
   }
 
-  public function getInput() {
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    $password_confirm = $_POST["password_confirm"];
+  public function getUsername() {
+    return $this->username;
+  }
 
-    // if (strlen($username) < 3) {
-    //   $this->errors[] = "Användarnamnet har för få tecken. Minst 3 tecken.";
-    //   // $this->message->save("Användarnamnet har för få tecken. Minst 3 tecken");
-    // }
-    // if (strlen($password) < 6) {
-    //   $this->errors[] = "Lösenordet har för få tecken. Minst 6 tecken.";
-    //   // $this->message->save("Lösenordet har för få tecken. Minst 6 tecken");
-    // }
-    // if ($password !== $password_confirm) {
-    //   $this->errors[] = "Lösenorden matchar inte.";
-    // }
+  public function getPassword() {
+    return $this->password;
+  }
 
-    if ($username != $this->sanitize($username)) {
-      return null;
+  public function getPasswordConfirmation() {
+    return $this->password_confirmation;
+  }
+
+  public function containsErrors($username, $password, $password_confirmation) {
+    
+    $errors = array();
+    if ($password !== $password_confirmation) {
+      $errors["password_confirmation"] = "Lösenorden matchar inte.";
+    }
+    try {
+      $this->model->setUsername($username);
+    }
+    catch(\InvalidArgumentException $e) {
+      $errors["username"] = "Användarnamnet har för få tecken. Minst 3 tecken.";
+    }
+    try {
+      $this->model->setPassword($password);
+    }
+    catch (\InvalidArgumentException $e) {
+      $errors["password"] = "Lösenorden har för få tecken. Minst 6 tecken.";
     }
 
+    if (!empty($errors)) {
+      $this->message->saveErr($errors);
+      return true;
+    }
+  }
 
-    return array(
-      "username" => $username,
-      "password" => $password,
-      "password_confirmation" => $password_confirm
-    );
+  public function getInput() {
+    $this->username = $_POST["username"];
+    $this->password = $_POST["password"];
+    $this->password_confirmation = $_POST["password_confirm"];
+
+    if ($this->username != $this->sanitize($this->username)) {
+      return false;
+    }
+    return true;
   }
 
   private function sanitize($input) {
@@ -127,14 +156,3 @@ class Register {
     return filter_var($temp, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
   }
 }
-
-
-
-
-
-
-
-
-
-
-

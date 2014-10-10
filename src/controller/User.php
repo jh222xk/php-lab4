@@ -31,7 +31,7 @@ class User {
     $this->model = new \model\User($this->store);
     $this->view = new \view\User($this->model);
 
-    $this->registerView = new \view\Register();
+    $this->registerView = new \view\Register($this->model);
     $this->message = new \view\CookieJar();
   }
 
@@ -108,49 +108,27 @@ class User {
   public function doRegister() {
     if ($this->registerView->triesToRegister()) {
         $data = $this->registerView->getInput();
-        if ($data !== null) {
-          if ($this->containsErrors($data) == false) {
-            $this->model->hashPassword($data["password"]);
+        $password = $this->registerView->getPassword();
+        $username = $this->registerView->getUsername();
+        $password_confirmation = $this->registerView->getPasswordConfirmation();
+
+        if ($data === true) {
+          if ($this->registerView->containsErrors($username, $password, $password_confirmation) == false) {
+            $this->model->hashPassword($password);
             $pass = $this->model->getHashedPassword();
             try {
-              $this->store->addUser($data["username"], $pass);
-              return $this->view->showLogin(true, $data["username"], "Yay, grattis du är nu medlem!");
+              $this->store->addUser($username, $pass);
+              return $this->view->showLogin(true, $username, "Yay, grattis du är nu medlem!");
             }
             catch (\Exception $e) {
-              $this->message->save($e->getMessage());
+              $this->registerView->setUsernameTakenMessage();
             }
           }
         }
         else {
-          $this->message->save("Användarnamnet innehåller ogiltiga tecken!");
+          $this->registerView->setInvalidCharsMessage();
         }
     }
     return $this->registerView->showRegister();
   }
-
-  public function containsErrors($data) {
-    
-    $errors = array();
-    if ($data["password"] !== $data["password_confirmation"]) {
-      $errors["password_confirmation"] = "Lösenorden matchar inte.";
-    }
-    try {
-      $this->model->setUsername($data["username"]);
-    }
-    catch(\InvalidArgumentException $e) {
-      $errors["username"] = $e->getMessage();
-    }
-    try {
-      $this->model->setPassword($data["password"]);
-    }
-    catch (\InvalidArgumentException $e) {
-      $errors["password"] = $e->getMessage();
-    }
-
-    if (!empty($errors)) {
-      $this->message->saveErr($errors);
-      return true;
-    }
-  }
-
 }

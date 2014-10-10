@@ -85,7 +85,7 @@ class User {
 
   public function setUsername($username) {
     if (strlen($username) < 3) {
-      throw new \InvalidArgumentException("Användarnamnet har för få tecken. Minst 3 tecken.");
+      throw new \InvalidArgumentException("The username needs to be 3 characters of length.");
     }
     $this->username = $username;
   }
@@ -100,7 +100,7 @@ class User {
 
   public function setPassword($password) {
     if (strlen($password) < 6) {
-      throw new \InvalidArgumentException("Lösenorden har för få tecken. Minst 6 tecken.");
+      throw new \InvalidArgumentException("The password needs to be 6 characters of length");
     }
     $this->password = $password;
   }

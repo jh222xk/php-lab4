@@ -18,7 +18,7 @@ class UserStore {
 
   public function addUser($user, $password) {
     if ($this->getUser($user)) {
-      throw new \Exception("Användarnamnet [$user] är redan upptaget!");
+      throw new \Exception("The user already exists!");
     }
 
     return $this->userDAL->insertUser($user, $password);
